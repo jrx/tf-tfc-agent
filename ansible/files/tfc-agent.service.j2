@@ -1,0 +1,19 @@
+[Unit]
+Description=TFC Agent Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+User=tfc-agent
+Group=docker
+EnvironmentFile=/etc/tfc-agent.d/tfc-agent.conf
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run --rm --name %n \
+    -e TFC_AGENT_TOKEN \
+    -e TFC_AGENT_NAME \
+    hashicorp/tfc-agent:{{ TFC_AGENT_VERSION }}
+
+[Install]
+WantedBy=default.target
