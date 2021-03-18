@@ -13,6 +13,8 @@ resource "aws_instance" "tfc_agent" {
   availability_zone = data.terraform_remote_state.vpc.outputs.aws_azs[count.index % length(data.terraform_remote_state.vpc.outputs.aws_azs)]
   subnet_id         = data.terraform_remote_state.vpc.outputs.aws_public_subnets[count.index % length(data.terraform_remote_state.vpc.outputs.aws_azs)]
 
+  user_data = data.template_file.user_data[count.index].rendered
+
   tags = {
     Name  = "${var.cluster_name}-tfc-agent-${count.index}"
     Owner = var.owner
@@ -21,36 +23,11 @@ resource "aws_instance" "tfc_agent" {
   }
 }
 
-resource "null_resource" "ansible" {
-  count = var.num_tfc_agent
-
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /home/${var.instance_username}/ansible",
-      "sudo yum -y install epel-release",
-      "sudo yum -y install ansible",
-    ]
-  }
-
-  provisioner "file" {
-    source      = "./ansible/"
-    destination = "/home/${var.instance_username}/ansible/"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "cd ansible; ansible-playbook -c local -i \"localhost,\" -e 'TFC_AGENT_NAME=${var.cluster_name}-tfc-agent-${count.index} TFC_AGENT_VERSION=${var.tfc_agent_version} TFC_AGENT_TOKEN=${var.tfc_agent_token}' tfc-agent.yml",
-    ]
-  }
-
-  connection {
-    host        = coalesce(element(aws_instance.tfc_agent.*.public_ip, count.index), element(aws_instance.tfc_agent.*.private_ip, count.index))
-    type        = "ssh"
-    user        = var.instance_username
-    private_key = var.private_key
-  }
-
-  triggers = {
-    always_run = timestamp()
+data "template_file" "user_data" {
+  count    = var.num_tfc_agent
+  template = file("${path.module}/templates/user_data.tpl")
+  vars = {
+    tfc_agent_token = var.tfc_agent_token
+    tfc_agent_name  = "${var.cluster_name}-tfc-agent-${count.index}"
   }
 }

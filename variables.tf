@@ -29,8 +29,7 @@ variable "aws_azs" {
 variable "amis" {
   type = map(string)
   default = {
-    #   eu-north-1 = "ami-026f0eb2e8006617d" # centos 7
-    eu-north-1 = "ami-0e201bc52c64d7b5a" # centos 8
+    eu-north-1 = "ami-095730fa90d6226bc"
   }
 }
 

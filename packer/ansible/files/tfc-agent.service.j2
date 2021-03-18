@@ -10,7 +10,7 @@ User=tfc-agent
 Group=docker
 EnvironmentFile=/etc/tfc-agent.d/tfc-agent.conf
 ExecStartPre=-/usr/bin/docker rm %n
-ExecStart=/usr/bin/docker run --rm --name %n \
+ExecStart=/usr/bin/docker run --rm --net=host --name %n \
     -e TFC_AGENT_TOKEN \
     -e TFC_AGENT_NAME \
     hashicorp/tfc-agent:{{ TFC_AGENT_VERSION }}
