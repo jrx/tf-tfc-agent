@@ -8,6 +8,7 @@ resource "aws_instance" "tfc_agent" {
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.default.id]
   associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.tfc_agent_profile.name
   count                       = var.num_tfc_agent
 
   availability_zone = data.terraform_remote_state.vpc.outputs.aws_azs[count.index % length(data.terraform_remote_state.vpc.outputs.aws_azs)]
