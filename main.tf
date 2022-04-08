@@ -1,9 +1,23 @@
+provider "hcp" {}
+
 provider "aws" {
   region = var.aws_region
 }
 
+data "hcp_packer_iteration" "rocky" {
+  bucket_name = "tfc-agent"
+  channel     = "stable"
+}
+
+data "hcp_packer_image" "rocky_eu_north_1" {
+  bucket_name    = "tfc-agent"
+  cloud_provider = "aws"
+  iteration_id   = data.hcp_packer_iteration.rocky.ulid
+  region         = var.aws_region
+}
+
 resource "aws_instance" "tfc_agent" {
-  ami                         = var.amis[var.aws_region]
+  ami                         = data.hcp_packer_image.rocky_eu_north_1.cloud_image_id
   instance_type               = var.tfc_agent_instance_type
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.default.id]

@@ -31,9 +31,9 @@ variable "owner" {
 
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
-source "amazon-ebs" "centos" {
+source "amazon-ebs" "rocky" {
   access_key                  = "${var.aws_access_key}"
-  ami_name                    = "packer centos ${local.timestamp}"
+  ami_name                    = "packer rocky ${local.timestamp}"
   associate_public_ip_address = true
   force_delete_snapshot       = true
   force_deregister            = true
@@ -42,17 +42,17 @@ source "amazon-ebs" "centos" {
   secret_key                  = "${var.aws_secret_key}"
   source_ami_filter {
     filters = {
-      product-code        = "47k9ia2igxpcce2bzo8u3kj03"
+      product-code        = "cotnnspjrsi38lfn8qo4ibnnm"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
     most_recent = true
     owners      = ["679593333241"]
   }
-  ssh_username = "centos"
+  ssh_username = "rocky"
   tags = {
-    Name       = "CentOS 8"
-    OS         = "centos"
+    Name       = "Rocky Linux 8"
+    OS         = "rocky"
     OS-Version = "8"
     Owner      = "${var.owner}"
   }
@@ -60,7 +60,24 @@ source "amazon-ebs" "centos" {
 }
 
 build {
-  sources = ["source.amazon-ebs.centos"]
+  sources = ["source.amazon-ebs.rocky"]
+
+  hcp_packer_registry {
+    bucket_name = "tfc-agent"
+    description = <<EOT
+Setup Terraform Cloud Agents (DEMO)
+    EOT
+    bucket_labels = {
+      "owner"      = "${var.owner}",
+      "os"         = "rocky",
+      "os-version" = "8",
+    }
+
+    build_labels = {
+      "build-time"   = timestamp(),
+      "build-source" = basename(path.cwd),
+    }
+  }
 
   provisioner "ansible" {
     playbook_file = "./ansible/tfc-agent.yml"

@@ -26,13 +26,6 @@ variable "aws_azs" {
   default     = ["eu-north-1a", "eu-north-1b", "eu-north-1c"]
 }
 
-variable "amis" {
-  type = map(string)
-  default = {
-    eu-north-1 = "ami-095730fa90d6226bc"
-  }
-}
-
 variable "instance_username" {
   default = "centos"
 }
