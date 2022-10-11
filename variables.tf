@@ -39,9 +39,15 @@ variable "tfc_agent_version" {
   default     = "latest"
   description = "Specifies which tfc-agent version instruction to use."
 }
+
 variable "tfc_agent_token" {
   default     = "example-token"
   description = "Specifies which tfc-agent token to use."
+}
+
+variable "tfc_agent_image" {
+  default     = "hashicorp/tfc-agent:latest"
+  description = "Specifies which Docker image to use."
 }
 
 variable "tfc_agent_instance_type" {

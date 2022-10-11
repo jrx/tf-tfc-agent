@@ -44,5 +44,6 @@ data "template_file" "user_data" {
   vars = {
     tfc_agent_token = var.tfc_agent_token
     tfc_agent_name  = "${var.cluster_name}-tfc-agent-${count.index}"
+    tfc_agent_image = var.tfc_agent_image
   }
 }

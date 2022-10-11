@@ -7,7 +7,7 @@
   vars:
     TFC_AGENT_NAME: "tfc-agent-example"
     TFC_AGENT_TOKEN : "example"
-    TFC_AGENT_VERSION : "latest"
+    TFC_AGENT_IMAGE : "hashicorp/tfc-agent:latest"
 
   tasks:
 
